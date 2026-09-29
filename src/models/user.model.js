@@ -5,11 +5,11 @@ import bcrypt from 'bcrypt'
 
 const userSchema = new mongoose.Schema({
 
-username: {
+userName: {
     type: String,
     required: [true, "Username is required"],
     unique: true,
-    lowercase: [true, "Username is alway lowercase"],
+    lowercase: true, 
     trim: true,
     index: true
 },
@@ -17,11 +17,11 @@ username: {
     type: String,
     required: [true, 'Email address is required'],
     unique: true,
-    lowercase: true, // Automatically converts the email to lowercase before saving
-    trim: true,      // Removes accidental leading/trailing spaces
-    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
+    lowercase: true, 
+    trim: true,      
+   
   }, 
-fullname: {
+fullName: {
     type: String,
     required: [true, "fullname is required"],
     trim: true,
@@ -48,13 +48,13 @@ refreshToken:{
 
 },{timestamps: true})
 
-userSchema.pre("save", async function(next){ 
+userSchema.pre("save", async function(){ 
 
-    if(!this.isModified("password")) return next();
+    if(!this.isModified("password")) return;
 
 
     this.password = await bcrypt.hash(this.password, 10)
-    next()
+    
 })
 
 userSchema.methods.isPasswordCorrect = async function(password){
@@ -67,8 +67,8 @@ userSchema.methods.generateAccessToken = function(){
         {
             _id: this.id,
             email: this.email,
-            username: this.username,
-            fullname: this.fullname
+            userName: this.userName,
+            fullName: this.fullName
 
         },
         process.env.ACCESS_TOKEN_SECRET,
