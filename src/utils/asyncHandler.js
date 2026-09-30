@@ -1,13 +1,13 @@
 
 // ########## FIRST WAY @@@@@@@@@@@@@@@
 
-const asyncHandler = (requestHandler)=> {
-  return  (req, res, next)=> {
-         Promise.resolve(requestHandler(req, res, next)).catch((err)=> next(err))
-    }
-}
+// const asyncHandler = (requestHandler)=> {
+//   return  (req, res, next)=> {
+//          Promise.resolve(requestHandler(req, res, next)).catch((err)=> next(err))
+//     }
+// }
 
-export {asyncHandler}
+// export {asyncHandler}
 
 
 // @@@@@@@@@@@ SECOND WAY @@@@@@@@@@@@@@@@
@@ -17,17 +17,17 @@ export {asyncHandler}
 // const asyncHandler = (fun)=> async()=>{}
 
 
-//  const asyncHandler = (fn) => async(req, res, next) => {
+ const asyncHandler = (fn) => async(req, res, next) => {
 
-//     try{
-//         await fn(req, res, next)
-//     }catch(error){
-//         res.status(error.statusCode || 500).json({
-//             success: false,
-//             message: error.message
-//         })
-//     }
+    try{
+        await fn(req, res, next)
+    }catch(error){
+        res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.message
+        })
+    }
 
-//  }   
+ }   
 
-//  export {asyncHandler}
+ export {asyncHandler}
