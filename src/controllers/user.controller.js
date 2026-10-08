@@ -6,7 +6,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from 'jsonwebtoken'
 
 
-//  Generate Access Token and Referesh Token
+//  Generate Access Token and Referesh Token // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const generateAccessAndRefereshTokens = async(userId)=>{
 
   try {
@@ -24,7 +24,7 @@ return {accessToken, refreshToken}
   }
 }
 
-// User Register controller
+// User Register controller // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const registerUser = asyncHandler(async (req, res) => {
   /* 
     - get all data from the user
@@ -101,7 +101,8 @@ const registerUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, createUser, "User registered successfully"));
 });
 
-// User Login controller
+
+// User Login controller // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const loginUser = asyncHandler( async(req, res)=>{
 
   // take data from  req.body
@@ -161,7 +162,7 @@ const {accessToken, refreshToken} =await generateAccessAndRefereshTokens(user._i
 
 })
 
-// User logout controller
+// User logout controller // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const logoutUser = asyncHandler( async (req, res)=>{
    await  User.findByIdAndUpdate(req.user._id,
       {
@@ -186,6 +187,9 @@ const logoutUser = asyncHandler( async (req, res)=>{
        .json(new ApiResponse(200,{}, "User logged Out"))
 })
 
+
+
+// Create RefreshToken // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const refreshAccessToken = asyncHandler(async(req, res)=>{
 
    const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
@@ -200,9 +204,7 @@ try {
 
  const decoded = jwt.verify( incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET)
 
-    if(!decoded){
-      throw new error(401, "Unauthorized request")
-    }
+
   
    const user = await User.findById(decoded?._id)
   
@@ -240,6 +242,21 @@ try {
 
 })
 
+
+// Password Change Route @@@@@@@@@@@@@@@@@
+const changeCurrentPassword = asyncHandler( async(req, res)=>{
+const {oldPassword, newPassword} = req.body
+
+ const user =  await User.findById(req.user._id)
+ const isPasswordCorrect =  await user.isPasswordCorrect(oldPassword)
+ if(!isPasswordCorrect){
+  throw new ApiError(400, "Invalid old password" )
+ }
+
+ user.password = newPassword
+ await user.save({validateBeforeSave: false})
+
+})
 export { registerUser, loginUser , logoutUser, refreshAccessToken };
 
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

@@ -26,6 +26,6 @@ route.post("/login", loginUser )
 
 // secured routes
 route.post("/logout", verifyJWT ,logoutUser )
-route.post("/refresh-token").post(refreshAccessToken)
+route.post("/refresh-token", refreshAccessToken)
 
 export default route;
