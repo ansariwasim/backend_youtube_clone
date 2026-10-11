@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from 'jsonwebtoken'
+import { Subcription } from "../models/subscription.model.js";
 
 
 //  Generate Access Token and Referesh Token // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -359,7 +360,81 @@ const updateUserCoverImage = asyncHandler(async(req, res)=>{
    .json(new ApiError (200, user, "coverImage updated successfully"))
 })
 
-export { registerUser, loginUser , logoutUser, refreshAccessToken , changeCurrentPassword, getCurrentUser, updateAccountDetails, updateUserAvatar ,  updateUserCoverImage};
+
+// Get User Channel Profile
+const getUserChannelProfile = asyncHandler(async(req, res)=>{
+
+  const {username} = req.params
+
+  if(!username?.trime()){
+    throw new ApiError(400, "Username is missing")
+  }
+
+ const channel =  await User.aggregate([
+  {
+    $match:{
+        username: username?.lowerCase()
+    }
+  },
+  {
+    $lookup:{
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "channel",
+        as: "subcribers"
+    }
+  },
+    {
+    $lookup:{
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "subcriber",
+        as: "subcribedTo"
+    }
+  },
+  {
+    $addFields:{
+      SubscribersCount: {
+        $size: "$subscribers"
+      },
+      channelsSubcribedToCount:{
+        $size: '$subcribedTo'
+      }, 
+      isSubscribed: {
+        $cond:{
+          if: {$in: [req.user?._id, "$subscribers.subscriber"]},
+          then: true,
+          else: false
+        }
+      }
+    }
+  },
+  {
+    $project: {
+      fullName: 1,
+      userName: 1,
+      SubscribersCount: 1,
+       channelsSubcribedToCount: 1,
+         isSubscribed: 1,
+         avatar: 1,
+         coverImage: 1,
+         email: 1
+    }
+  }
+])
+
+
+if(!channel?.length){
+  throw new ApiError(404, "channel does not exists")
+}
+
+return res.status(200).json(new ApiResponse(200, channel[0], "User channel fetched successfully"))
+
+})
+
+
+
+export { registerUser, loginUser , logoutUser, refreshAccessToken , changeCurrentPassword, getCurrentUser, updateAccountDetails, updateUserAvatar ,  updateUserCoverImage, getUserChannelProfile };
 
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
