@@ -25,6 +25,9 @@ return {accessToken, refreshToken}
   }
 }
 
+
+
+
 // User Register controller // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const registerUser = asyncHandler(async (req, res) => {
   /* 
@@ -117,8 +120,12 @@ const loginUser = asyncHandler( async(req, res)=>{
   const {email, userName, password} = req.body
 
   if(!(email || userName)){
-    throw new ApiError(400, "Email and Username is required")
+    throw new ApiError(400, "Email or Username is required")
   }
+
+  if (!password) {
+  throw new ApiError(400, "Password is required");
+}
 
  const user =  await User.findOne({
     $or: [{userName}, {email}]
@@ -128,13 +135,15 @@ const loginUser = asyncHandler( async(req, res)=>{
     throw new ApiError (404, "User doesnot exist. first you register")
   }
 
+
+
   const isPasswordValid =  await user.isPasswordCorrect(password)
   
   if(!isPasswordValid){
     throw new ApiError(401, "Invalid user credentials password")
   }
 
-const {accessToken, refreshToken} =await generateAccessAndRefereshTokens(user._id);
+const {accessToken, refreshToken} = await generateAccessAndRefereshTokens(user._id);
 
 //  This is optional step 
  const loggedInUser =  await User.findById(user._id).select("-password -refreshToken")
@@ -147,7 +156,7 @@ const {accessToken, refreshToken} =await generateAccessAndRefereshTokens(user._i
  return res
  .status(200)
  .cookie("accessToken", accessToken, options)
- .cookie("refreshToken", accessToken, options)
+ .cookie("refreshToken", refreshToken, options)
  .json(new ApiResponse(
     200,
     {
