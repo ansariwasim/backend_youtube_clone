@@ -28,3 +28,48 @@ const uploadOnCloudinary = async (localFilePath) => {
 };
 
 export { uploadOnCloudinary };
+
+
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+// import { v2 as cloudinary } from "cloudinary";
+// import fs from "fs";
+
+// cloudinary.config({
+//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+//   api_key: process.env.CLOUDINARY_API_KEY,
+//   api_secret: process.env.CLOUDINARY_API_SECRET,
+
+ 
+// });
+
+// const uploadOnCloudinary = async (localFilePath) => {
+//   if (!localFilePath) {
+//     console.log("Local file path is missing");
+//     return null;
+//   }
+
+//   try {
+//     const response = await cloudinary.uploader.upload(
+//       localFilePath,
+//       {
+//         resource_type: "auto",
+//       }
+//     );
+
+//     console.log("Cloudinary upload successful:", response.secure_url);
+
+//     return response;
+//   } catch (error) {
+//     console.error("Cloudinary upload failed:", error.message);
+//     return null;
+//   } finally {
+//     // Delete the temporary file if it still exists
+//     if (fs.existsSync(localFilePath)) {
+//       fs.unlinkSync(localFilePath);
+//     }
+//   }
+// };
+
+// export { uploadOnCloudinary };
