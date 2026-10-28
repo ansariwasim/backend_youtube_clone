@@ -52,6 +52,15 @@ const video = await Video.create({
 const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     //TODO: get video by id
+    const video = await Video.findById(videoId)
+   
+    if(!video){
+        throw new ApiError(400, "Video not found")
+    }
+    
+    return res
+    .status(200)
+    .json(new ApiResponse(200, {video}, "video fetched successfully"))
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
@@ -75,16 +84,9 @@ if(video.owner.toString() !== req.user._id.toString()){
    throw new ApiError(400, "you are not authorized to delete this video")
 } 
 
-
-
-
     const deleteVideo = await Video.findByIdAndDelete(videoId)
         
 
-
-
-      
-    
     return res
     .status(200)
     .json(new ApiResponse(200, {deleteVideo}, "Deleted video successfully"))
