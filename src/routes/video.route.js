@@ -22,5 +22,6 @@ route.post("/",verifyJWT, upload.fields([
         maxCount: 1,
     }
 ]), publishAVideo)
+route.post("/:videoId", verifyJWT, deleteVideo)
 
 export default route;
