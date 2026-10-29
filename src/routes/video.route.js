@@ -28,4 +28,7 @@ route.post("/:videoId", verifyJWT, deleteVideo)
 // get video all video
 route.get("/:videoId", verifyJWT, getVideoById)
 
+
+// updated video 
+route.patch("/update/:videoId" , verifyJWT, upload.single("thumbnail"), updateVideo)
 export default route;
