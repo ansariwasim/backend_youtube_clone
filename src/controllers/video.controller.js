@@ -4,7 +4,7 @@ import {User} from "../models/user.model.js"
 import {ApiError} from "../utils/apiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
-import {uploadOnCloudinary} from "../utils/cloudinary.js"
+import { uploadOnCloudinary} from "../utils/cloudinary.js"
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
@@ -12,6 +12,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     //TODO: get all videos based on query, sort, pagination
 })
 
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const publishAVideo = asyncHandler(async (req, res) => {
     const { title, description} = req.body
     // TODO: get video, upload to cloudinary, create video
@@ -49,6 +50,7 @@ const video = await Video.create({
  .json(new ApiResponse(200, {video}, "Video creating succssfully"))
 })
 
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     //TODO: get video by id
@@ -66,6 +68,46 @@ const getVideoById = asyncHandler(async (req, res) => {
 const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     //TODO: update video details like title, description, thumbnail
+
+    // find video
+    const video = await Video.findById(videoId)
+
+    if(!video){
+        throw new ApiError(400, "Video not found")
+    }
+
+    // check whether login user create this video
+    if(video.owner.toString() !== req.user._id.toString()){
+        throw new ApiError(400, "unauthorized user")
+    }
+
+    const {title, description} = req.body
+    const localPathThumbnail = req.file?.path
+    console.log(localPathThumbnail)
+    const thumbnail = await uploadOnCloudinary(localPathThumbnail)
+
+    if(!thumbnail.url){
+        throw new ApiError(400, "Thumbnail url not found")
+    }
+    
+    const updateVideo = await Video.findByIdAndUpdate(videoId,
+        {
+           $set:{
+             title : title,
+             description: description,
+             thumbnail: thumbnail.url
+           }
+
+        },
+        {
+            new: true,
+            runValidators: true
+        }
+    )
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, {updateVideo}, "updated video successfully"))
 
 })
 
