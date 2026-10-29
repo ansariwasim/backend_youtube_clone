@@ -17,7 +17,8 @@ const videoSchema = new mongoose.Schema({
         required: true
     },
     description: {
-        type: String
+        type: String,
+        required: true
     },
     duration: {
         type: Number,  // cloudinary 
@@ -33,7 +34,8 @@ const videoSchema = new mongoose.Schema({
     },
     owner: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+        ref: "User",
+        required: true
     }
 
 
@@ -43,4 +45,4 @@ const videoSchema = new mongoose.Schema({
 videoSchema.plugin(mongooseAggregatePaginate)
 
 
-export const Video = mongoose.model("User", videoSchema)
+export const Video = mongoose.model("Video", videoSchema)
