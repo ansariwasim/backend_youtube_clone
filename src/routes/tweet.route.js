@@ -7,7 +7,11 @@ import { createTweet,
 const route = express.Router()    
 
 route.post("/",verifyJWT, createTweet)
+
+// update tweet route
 route.patch("/:tweetId", verifyJWT, updateTweet)
+// delete tweet route
+route.get("/:tweetId", verifyJWT, deleteTweet)
 
 export default route;
 
