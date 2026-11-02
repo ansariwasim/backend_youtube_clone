@@ -30,6 +30,7 @@ const getUserTweets = asyncHandler(async (req, res) => {
   
 });
 
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const updateTweet = asyncHandler(async (req, res) => {
   //TODO: update tweet
   const {tweetId} = req.params
@@ -43,7 +44,7 @@ const updateTweet = asyncHandler(async (req, res) => {
  
   // check whether login user are created tweet
   if(tweet.owner.toString() !== req.user._id.toString()){
-    throw new ApiError(400, "unauthorized user @@")
+    throw new ApiError(400, "unauthorized user")
   }
 
 
@@ -66,8 +67,28 @@ const updateTweet = asyncHandler(async (req, res) => {
 
 });
 
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const deleteTweet = asyncHandler(async (req, res) => {
   //TODO: delete tweet
+     const {tweetId} = req.params
+
+     const tweet = await Tweet.findById(tweetId)
+     if(!tweet){
+      throw new ApiError(400, "Tweet not found")
+     }
+
+    //  check login user or create this tweet
+     if(tweet.owner.toString() !== req.user._id.toString()){
+      throw new ApiError(400, "unauthoried user")
+     }
+
+  const deleteTweet =   await Tweet.findByIdAndDelete(tweetId,{
+      new: true
+     })
+
+     return res
+     .status(200)
+     .json(new ApiResponse(200, {deleteTweet}, "Deleted tweet successfully"))
 });
 
 export { createTweet, getUserTweets, updateTweet, deleteTweet };
