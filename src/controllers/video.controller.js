@@ -65,6 +65,7 @@ const getVideoById = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {video}, "video fetched successfully"))
 })
 
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     //TODO: update video details like title, description, thumbnail
@@ -83,7 +84,6 @@ const updateVideo = asyncHandler(async (req, res) => {
 
     const {title, description} = req.body
     const localPathThumbnail = req.file?.path
-    console.log(localPathThumbnail)
     const thumbnail = await uploadOnCloudinary(localPathThumbnail)
 
     if(!thumbnail.url){
@@ -111,6 +111,7 @@ const updateVideo = asyncHandler(async (req, res) => {
 
 })
 
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const deleteVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     //TODO: delete video

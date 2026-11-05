@@ -4,7 +4,7 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
-import { Subcription } from "../models/subscription.model.js";
+// import { Subcription } from "../models/subscription.model.js";
 import mongoose from "mongoose";
 
 //  Generate Access Token and Referesh Token // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
