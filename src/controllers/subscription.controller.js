@@ -12,10 +12,10 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 const toggleSubscription = asyncHandler(async (req, res) => {
   // TODO: toggle subscription
   const { channelId } = req.params;
- console.log("channelId", channelId)
+
   // login user id
   const subscriberId = req.user?.id;
-  console.log("subscriberId" ,subscriberId)
+
 
   // check whether channel is exist
   const channel = await User.findById(channelId);
@@ -38,14 +38,18 @@ const toggleSubscription = asyncHandler(async (req, res) => {
       .json(new ApiResponse(200, {}, "unsubscribed successfully"));
   }
 
-  await Subscription.create({
+ const subscriber =  await Subscription.create({
     subscriber: subscriberId,
     channel: channelId,
-  });
+  })
+
+ await subscriber.populate("subscriber", "fullName")
+ await subscriber.populate("channel", "fullName")
+
 
   return res
     .status(200)
-    .json(new ApiResponse(200, {}, "Subscribed successfully"));
+    .json(new ApiResponse(200, {subscriber}, "Subscribed successfully"));
 });
 
 
