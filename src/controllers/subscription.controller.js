@@ -75,6 +75,19 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
 // controller to return channel list to which user has subscribed
 const getSubscribedChannels = asyncHandler(async (req, res) => {
   const { subscriberId } = req.params;
+
+  const subscriber = await User.findById(subscriberId)
+
+  if(!subscriber){
+    throw new ApiError(400, "Subscriber not found")
+  }
+
+  const allChannel = await Subscription.find({
+
+    subscriber: subscriberId
+  }).populate("channel", "fullName")
+
+  return res.status(200).json( new ApiResponse(200, {allChannel}, "Subscriber channel fatching successfully"))
 });
 
 export { toggleSubscription, getUserChannelSubscribers, getSubscribedChannels };
