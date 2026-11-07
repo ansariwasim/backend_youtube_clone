@@ -46,8 +46,11 @@ import {  verifyJWT } from '../middleware/auth.middleware.js';
 
 
 route.post("/c/:channelId",verifyJWT, toggleSubscription )
-// channel all subscriber
+// all subscriber who subscriber the channel
 route.get("/:channelId", verifyJWT, getUserChannelSubscribers)
+// all channel 
+route.get("/channel/:subscriberId", verifyJWT, getSubscribedChannels)
+
 
 
 export default route;
