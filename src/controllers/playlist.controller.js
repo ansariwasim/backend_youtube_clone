@@ -6,6 +6,7 @@ import {asyncHandler} from "../utils/asyncHandler.js"
 import { Video } from "../models/video.model.js"
 
 
+// @@@@@@@@@@@@@@@@@@@@@@@@@
 const createPlaylist = asyncHandler(async (req, res) => {
     //TODO: create playlist
     const {name, description} = req.body
@@ -30,6 +31,17 @@ const createPlaylist = asyncHandler(async (req, res) => {
 const getUserPlaylists = asyncHandler(async (req, res) => {
     const {userId} = req.params
     //TODO: get user playlists
+    if(!userId){
+        throw new ApiError(400, "user not found")
+    }
+
+    const userPlayList = await Playlist.find({
+        owner: userId
+    })
+
+    return res.status(200).json(new ApiResponse(200, {userPlayList}, "fetching userPlayList data successfully"))
+
+
 })
 
 const getPlaylistById = asyncHandler(async (req, res) => {
