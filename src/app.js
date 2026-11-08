@@ -35,6 +35,7 @@ import userRoute from '../src/routes/user.route.js'
 import videoRouter from '../src/routes/video.route.js'
 import tweetRouter from '../src/routes/tweet.route.js'
 import subscriptionRouter from '../src/routes/subscription.route.js'
+import playlistRouter from '../src/routes/playlist.route.js'
 
 //routes declaration
 
@@ -42,6 +43,7 @@ app.use("/api/v1/user", userRoute )
 app.use("/api/v1/videos", videoRouter)
 app.use("/api/v1/tweets", tweetRouter)
 app.use("/api/v1/subscriptions", subscriptionRouter)
+app.use("/api/v1/playlist", playlistRouter)
 
  export {app}
 
