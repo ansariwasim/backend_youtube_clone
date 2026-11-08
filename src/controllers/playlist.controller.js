@@ -38,7 +38,7 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
 
     const userPlayList = await Playlist.find({
         owner: userId
-    }).populate("videos")
+    }).populate("videos", "videoFile")
 
     return res.status(200).json(new ApiResponse(200, {userPlayList}, "fetching userPlayList data successfully"))
 
@@ -66,10 +66,42 @@ if(!playlist){
 })
 
 
-
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
 const addVideoToPlaylist = asyncHandler(async (req, res) => {
     const {playlistId, videoId} = req.params
+
+    // validation 
+    if([playlistId, videoId].some((field)=> !field || field.trim() == "")){
+        throw new ApiError(400, "playlistId or videoId are not found")
+    }
+    // find video
+     const video = await Video.findById(videoId)
+
+   if(!video){
+    throw new ApiError(400, "video not found")
+   }
+
+    //  find playlist
+    const playlist = await Playlist.findByIdAndUpdate(playlistId,
+        {
+          $addToSet: {
+            videos: video
+          }  
+        },
+        {
+            new: true,
+            runValidators: true
+        }
+    )
+
+    if(!playlist){
+        throw new ApiError(400, "playlist not found")
+    }
+
+    return res.status(201).json(new ApiResponse(201, {playlist}, "Added video on playlist successfully"))
 })
+
+
 
 const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
     const {playlistId, videoId} = req.params
