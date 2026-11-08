@@ -28,6 +28,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
 
 })
 
+// @@@@@@@@@@@@@@@@@@@@@@@@@
 const getUserPlaylists = asyncHandler(async (req, res) => {
     const {userId} = req.params
     //TODO: get user playlists
@@ -37,17 +38,34 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
 
     const userPlayList = await Playlist.find({
         owner: userId
-    })
+    }).populate("videos")
 
     return res.status(200).json(new ApiResponse(200, {userPlayList}, "fetching userPlayList data successfully"))
 
 
 })
 
+// @@@@@@@@@@@@@@@@@@@@@@@@
 const getPlaylistById = asyncHandler(async (req, res) => {
     const {playlistId} = req.params
     //TODO: get playlist by id
+    if(!playlistId){
+        throw new ApiError(400, "Playlist not found@@")
+    }
+
+  const playlist = await Playlist.findOne({
+    _id: playlistId,
+    owner: req.user._id
+  }).populate("videos")
+
+if(!playlist){
+    throw new ApiError(400, "Playlist not found")
+}
+
+  return res.status(200).json(new ApiResponse(200, {playlist}, "fatching playlist successfully"))
 })
+
+
 
 const addVideoToPlaylist = asyncHandler(async (req, res) => {
     const {playlistId, videoId} = req.params
