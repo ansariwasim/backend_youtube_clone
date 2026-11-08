@@ -16,5 +16,7 @@ route.post("/", verifyJWT, createPlaylist)
 route.get("/g/:userId", verifyJWT, getUserPlaylists)
 // get playlist 
 route.get("/:playlistId", verifyJWT, getPlaylistById)
+// add video on playlist
+route.post ("/:playlistId/:videoId", verifyJWT, addVideoToPlaylist)
 
 export default route;
