@@ -14,6 +14,7 @@ import { verifyJWT } from "../middleware/auth.middleware.js"
 route.post("/", verifyJWT, createPlaylist)
 // get user Playlist route
 route.get("/g/:userId", verifyJWT, getUserPlaylists)
-
+// get playlist 
+route.get("/:playlistId", verifyJWT, getPlaylistById)
 
 export default route;
