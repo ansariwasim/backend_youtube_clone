@@ -85,7 +85,7 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
     const playlist = await Playlist.findByIdAndUpdate(playlistId,
         {
           $addToSet: {
-            videos: video
+            videos: videoId
           }  
         },
         {
@@ -102,12 +102,40 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
 })
 
 
-
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
 const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
     const {playlistId, videoId} = req.params
     // TODO: remove video from playlist
+    if([playlistId, videoId].some((field)=> !field || field.trim() == "")){
+        throw new ApiError(400, "playlistId and videoId are required")
+    }
 
-})
+    const video = await Video.findById(videoId)
+
+    if(!video){
+        throw new ApiError(400, "Video not found")
+    }
+
+  const playlist = await Playlist.findByIdAndUpdate(
+    playlistId,
+    {
+        $pull: {
+            videos: videoId
+        }
+    },
+    {
+        new: true
+    }
+);
+
+if (!playlist) {
+    throw new ApiError(404, "Playlist not found");
+}
+
+return res.status(200).json(new ApiResponse( 200, {playlist}, "deleted video from playlist successfully"))
+}) 
+
+
 
 const deletePlaylist = asyncHandler(async (req, res) => {
     const {playlistId} = req.params
