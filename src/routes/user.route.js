@@ -37,11 +37,11 @@ route.post("/login", loginUser )
 // secured routes
 route.post("/logout", verifyJWT ,logoutUser )
 route.post("/refresh-token", refreshAccessToken)
-route.post("/change-password", verifyJWT,  changeCurrentPassword )
+route.patch("/change-password", verifyJWT,  changeCurrentPassword )
 route.get("/current-user", verifyJWT, getCurrentUser)
 route.patch("/update-account", verifyJWT, updateAccountDetails)
 route.patch("/avatar", verifyJWT, upload.single("avatar"), updateUserAvatar)
-route.patch("/coverImage", verifyJWT, upload.single("coverimage"), updateUserCoverImage)
+route.patch("/coverImage", verifyJWT, upload.single("coverImage"), updateUserCoverImage)
 route.get("/c/:username", verifyJWT , getUserChannelProfile)
 route.get("/history", verifyJWT, getWatchHistory )
 
