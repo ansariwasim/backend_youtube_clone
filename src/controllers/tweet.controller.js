@@ -30,7 +30,6 @@ const getUserTweets = asyncHandler(async (req, res) => {
   // TODO: get user tweets
       const { userId } = req.params;
 
-   console.log("userId")
     // Find all tweets created by this user
     const tweets = await Tweet.find({owner: userId })
     //  .populate("owner", "userName fullName avatar")
@@ -38,7 +37,7 @@ const getUserTweets = asyncHandler(async (req, res) => {
 
     // Check if tweets exist
     if (!tweets.length) {
-        throw new ApiError(404, "No tweets found @");
+        throw new ApiError(404, "No tweets found ");
     }
 
     return res
@@ -58,6 +57,10 @@ const updateTweet = asyncHandler(async (req, res) => {
   const {tweetId} = req.params
   const {content} = req.body
 
+ if(!content?.trim()){
+  throw new ApiError(400, "tweet content is required")
+ }
+
   const tweet = await Tweet.findById(tweetId)
 
   if(!tweet){
@@ -72,7 +75,9 @@ const updateTweet = asyncHandler(async (req, res) => {
 
   const updateTweet = await Tweet.findByIdAndUpdate(tweetId,
     {
-      content
+      $set:{
+          content: content.trim()
+      }
     },
     {
       new: true,
@@ -83,7 +88,7 @@ const updateTweet = asyncHandler(async (req, res) => {
 
   return res
   .status(200)
-  .json(new ApiResponse(200, {updateTweet}, "updated tweet successfully"))
+  .json(new ApiResponse(200, {tweet: updateTweet}, "Tweet updated successfully"))
 
 
 
@@ -96,7 +101,7 @@ const deleteTweet = asyncHandler(async (req, res) => {
 
      const tweet = await Tweet.findById(tweetId)
      if(!tweet){
-      throw new ApiError(400, "Tweet not found")
+      throw new ApiError(400, "Tweet not found@")
      }
 
     //  check login user or create this tweet
@@ -110,7 +115,7 @@ const deleteTweet = asyncHandler(async (req, res) => {
 
      return res
      .status(200)
-     .json(new ApiResponse(200, {deleteTweet}, "Deleted tweet successfully"))
+     .json(new ApiResponse(200, {deleteTweet}, "tweet deleted successfully"))
 });
 
 export { createTweet, getUserTweets, updateTweet, deleteTweet };
