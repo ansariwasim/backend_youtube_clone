@@ -71,7 +71,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const avatar = await uploadOnCloudinary(avatarLocalPath);
   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
-  console.log(avatar)
+ 
   // avarer image not found
   if (!avatar) {
     throw new ApiError(400, " Avatar is required");
@@ -189,7 +189,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     .status(200)
     .clearCookie("accessToken", options)
     .clearCookie("refreshToken", options)
-    .json(new ApiResponse(200, {}, "User logged Out"));
+    .json(new ApiResponse(200, {}, "User logged Out successfully"));
 });
 
 // Create RefreshToken // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -248,6 +248,10 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 const changeCurrentPassword = asyncHandler(async (req, res) => {
   const { oldPassword, newPassword } = req.body;
 
+   if([oldPassword, newPassword].some((field)=> !field || field.trim() == "")){
+     throw new ApiError(400, "All Fields are required")
+   }
+
   const user = await User.findById(req.user?._id);
   const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
   if (!isPasswordCorrect) {
@@ -271,20 +275,25 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 
 // @@@@@@@@@@@@@@@@
 const updateAccountDetails = asyncHandler(async (req, res) => {
-  const { fullName, email } = req.body;
-  if (!fullName || !email) {
+  const { newFullName, newEmail } = req.body;
+  if (!newFullName || !newEmail) {
     throw new ApiError(400, "All fields are required");
   }
 
-  const user = User.findByIdAndUpdate(
+  const user = await User.findByIdAndUpdate(
     req.user?._id,
     {
       $set: {
-        fullName,
-        email: email,
+        fullName: newFullName,
+        email: newEmail
+    
       },
     },
-    { new: true }, // update hone k baad jo information hoti hai . woh data return karo
+    {
+       new: true,
+       runValidators: true
+
+     }, // update hone k baad jo information hoti hai . woh data return karo
   ).select("-password");
 
   return res
@@ -314,7 +323,10 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         avatar: avatar.url,
       },
     },
-    { new: true },
+    {
+       new: true,
+       runValidators: true
+      },
   ).select("-password");
 
   return res
@@ -340,29 +352,36 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     req.user?._id,
     {
       $set: {
-        converImage: coverImage.url,
+        coverImage: coverImage.url,
       },
     },
-    { new: true },
+    {
+       new: true,
+       runValidators: true
+      
+      },
   ).select("-password");
 
   return res
     .status(200)
-    .json(new ApiError(200, user, "coverImage updated successfully"));
+    .json(new ApiResponse(200, {user}, "coverImage updated successfully"));
 });
+
+
+
 
 // Get User Channel Profile
 const getUserChannelProfile = asyncHandler(async (req, res) => {
   const { username } = req.params;
 
-  if (!username?.trime()) {
+  if (!username?.trim()) {
     throw new ApiError(400, "Username is missing");
   }
 
   const channel = await User.aggregate([
     {
       $match: {
-        username: username?.lowerCase(),
+        userName: username?.toLowerCase(),
       },
     },
     {
@@ -370,15 +389,15 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
         from: "subscriptions",
         localField: "_id",
         foreignField: "channel",
-        as: "subcribers",
+        as: "subscribers",
       },
     },
     {
       $lookup: {
         from: "subscriptions",
         localField: "_id",
-        foreignField: "subcriber",
-        as: "subcribedTo",
+        foreignField: "subscriber",
+        as: "subscribedTo",
       },
     },
     {
@@ -387,7 +406,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
           $size: "$subscribers",
         },
         channelsSubcribedToCount: {
-          $size: "$subcribedTo",
+          $size: "$subscribedTo",
         },
         isSubscribed: {
           $cond: {
@@ -482,6 +501,8 @@ return res
 .json(new ApiResponse(200, user[0].getWatchHistory, "Watch history fetch successfully"))
 
 })
+
+
 
 export {
   registerUser,
