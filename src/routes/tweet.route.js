@@ -16,7 +16,7 @@ route.get("/:userId", verifyJWT, getUserTweets)
 route.patch("/:tweetId", verifyJWT, updateTweet)
 
 // delete tweet route
-route.get("/:tweetId", verifyJWT, deleteTweet)
+route.get("/d/:tweetId", verifyJWT, deleteTweet)
 
 export default route;
 
