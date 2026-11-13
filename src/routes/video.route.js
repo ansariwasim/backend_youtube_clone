@@ -22,11 +22,13 @@ route.post("/",verifyJWT, upload.fields([
         maxCount: 1,
     }
 ]), publishAVideo)
+
+
+// get video by Id
+route.get("/:videoId", verifyJWT, getVideoById)
+
 // delete video route
 route.post("/:videoId", verifyJWT, deleteVideo)
-
-// get video all video
-route.get("/:videoId", verifyJWT, getVideoById)
 
 
 // updated video 
