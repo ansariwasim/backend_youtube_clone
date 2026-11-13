@@ -1,6 +1,6 @@
 import mongoose, {isValidObjectId} from "mongoose"
 import {Playlist} from "../models/playlist.model.js"
-import {ApiError} from "../utils/ApiError.js"
+import {ApiError} from "../utils/apiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 import { Video } from "../models/video.model.js"
@@ -33,8 +33,8 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
     const {userId} = req.params
     //TODO: get user playlists
     if(!userId){
-        throw new ApiError(400, "user not found")
-    }
+        throw new ApiError(400, "User not found")
+    }  
 
     const userPlayList = await Playlist.find({
         owner: userId
@@ -44,6 +44,7 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
 
 
 })
+
 
 // @@@@@@@@@@@@@@@@@@@@@@@@
 const getPlaylistById = asyncHandler(async (req, res) => {
@@ -81,6 +82,12 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
     throw new ApiError(400, "video not found")
    }
 
+   const playlistExist = await Playlist.findById(playlistId)
+
+   if(playlistExist.owner.toString() !== req.user._id.toString()){
+        throw new ApiError( 400,  "unauthorised user to add video on this playlist")
+   }
+
     //  find playlist
     const playlist = await Playlist.findByIdAndUpdate(playlistId,
         {
@@ -116,6 +123,17 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Video not found")
     }
 
+   const playlistExist = await Playlist.findById(playlistId)
+
+   if(!playlistExist){
+        throw new ApiError(400, "Playlist not found")
+   }
+
+   if(playlistExist.owner.toString() !== req.user._id.toString()){
+        throw new ApiError( 400,  "unauthorised user to add video on this playlist")
+
+   }
+
   const playlist = await Playlist.findByIdAndUpdate(
     playlistId,
     {
@@ -132,15 +150,33 @@ if (!playlist) {
     throw new ApiError(404, "Playlist not found");
 }
 
-return res.status(200).json(new ApiResponse( 200, {playlist}, "deleted video from playlist successfully"))
+return res.status(200).json(new ApiResponse( 200, {playlist}, "Remove video from playlist successfully"))
 }) 
 
 
-
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
 const deletePlaylist = asyncHandler(async (req, res) => {
     const {playlistId} = req.params
     // TODO: delete playlist
+    if( !playlistId){
+        throw new ApiError(400, "playlistId not found")
+    }
+
+    const playlist = await Playlist.findOneAndDelete({
+      _id: playlistId,
+      owner: req.user._id
+    })
+
+    if(!playlist){
+        throw new ApiError(400, "Playlist not found")
+    }
+
+    return res.status(200).json(new ApiResponse(200, {playlist}, "Deleted playlist successfully"))
 })
+
+
+
+
 
 const updatePlaylist = asyncHandler(async (req, res) => {
     const {playlistId} = req.params
