@@ -22,5 +22,7 @@ route.post ("/:playlistId/:videoId", verifyJWT, addVideoToPlaylist)
 route.post ("/r/:playlistId/:videoId", verifyJWT, removeVideoFromPlaylist)
 // delete playlist route
 route.delete("/delete/:playlistId", verifyJWT, deletePlaylist)
+// Update Playlist
+route.patch("/update/:playlistId", verifyJWT, updatePlaylist)
 
 export default route;
