@@ -15,7 +15,9 @@ import { verifyJWT } from '../middleware/auth.middleware.js';
 // add comment route
 route.post("/c/:videoId",verifyJWT, addComment)
 // update comment route
-route.post("/update/:commentId", verifyJWT, updateComment)
+route.patch("/update/:commentId", verifyJWT, updateComment)
+//  delete comment route
+route.delete("/delete/:commentId", verifyJWT, deleteComment)
 
 
 
