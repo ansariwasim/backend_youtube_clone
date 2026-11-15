@@ -11,8 +11,6 @@ const getVideoComments = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
 });
 
-
-
 //  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const addComment = asyncHandler(async (req, res) => {
   // TODO: add a comment to a video
@@ -30,56 +28,96 @@ const addComment = asyncHandler(async (req, res) => {
   }
 
   const comment = await Comment.create({
-
     content,
     video: videoId,
-    owner: req.user._id
-
+    owner: req.user._id,
   });
 
-  return res.status(201).json( new ApiResponse(201, {comment}, "Comment created successfully"))
-
+  return res
+    .status(201)
+    .json(new ApiResponse(201, { comment }, "Comment created successfully"));
 });
 
-
-
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const updateComment = asyncHandler(async (req, res) => {
   // TODO: update a comment
-  const{commentId} = req.params
-  const{content} = req.body
+  const { commentId } = req.params;
+  const { content } = req.body;
 
-if(!content){
-  throw new ApiError(400, "Content is required")
-}
-
-const updateComment = await Comment.findOneAndUpdate(
-  {
-    _id: commentId,
-    owner: req.user._id
-  },
-  {
-    $set:{
-      content
-    }
-  },
-  {
-    new: true,
-    runValidators: true
+  if (!content) {
+    throw new ApiError(400, "Content is required");
   }
-)
 
-if(!updateComment){
-  throw new ApiError(400, "updateComment not found or unauthorised user to try update this comment")
-}
+  const updateComment = await Comment.findOneAndUpdate(
+    {
+      _id: commentId,
+      owner: req.user._id,
+    },
+    {
+      $set: {
+        content,
+      },
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
 
-return res.status(200).json(new ApiResponse(200, {updateComment}, "Comment updated successfully"))
+  if (!updateComment) {
+    throw new ApiError(
+      400,
+      "updateComment not found or unauthorised user to try update this comment",
+    );
+  }
 
-  
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, { updateComment }, "Comment updated successfully"),
+    );
 });
 
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const deleteComment = asyncHandler(async (req, res) => {
   // TODO: delete a comment
+
+  const { commentId } = req.params;
+
+  if (!commentId) {
+    throw new ApiError(400, "commentId not found");
+  }
+
+  const comment = await Comment.findById(commentId);
+
+  if (!comment) {
+    throw new ApiError(400, "Comment not found");
+  }
+
+
+   // Find the video associated with this comment
+  const video = await Video.findById(comment.video);
+
+  if (!video) {
+    throw new ApiError(200, "video not found");
+  }
+
+  //  check the comment owner
+  const isVideoOwner = video.owner.toString() === req.user._id.toString();
+
+  const isCommentOwner = comment.owner.toString() === req.user._id.toString();
+
+  if (!isCommentOwner && !isVideoOwner) {
+    throw new ApiError(400, "unauthorised User");
+  }
+
+  const deleteComment = await Comment.findByIdAndDelete(commentId);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, { deleteComment }, "Comment deleted successfully"),
+    );
 });
 
 export { getVideoComments, addComment, updateComment, deleteComment };
