@@ -37,6 +37,7 @@ import tweetRouter from '../src/routes/tweet.route.js'
 import subscriptionRouter from '../src/routes/subscription.route.js'
 import playlistRouter from '../src/routes/playlist.route.js'
 import commentRouter from "../src/routes/comment.route.js"
+import likeRouter from "../src/routes/like.route.js"
 
 //routes declaration
 
@@ -46,7 +47,7 @@ app.use("/api/v1/tweets", tweetRouter)
 app.use("/api/v1/subscriptions", subscriptionRouter)
 app.use("/api/v1/playlists", playlistRouter)
 app.use("/api/v1/comments", commentRouter)
-
+app.use("/api/v1/likes", likeRouter)
  export {app}
 
 
