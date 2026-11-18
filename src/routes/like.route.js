@@ -14,5 +14,7 @@ route.post("/video/:videoId", verifyJWT, toggleVideoLike);
 route.post("/comment/:commentId", verifyJWT, toggleCommentLike)
 //  toggle tweet like
 route.post("/tweet/:tweetId", verifyJWT, toggleTweetLike)
+// getAllLikedVideo
+route.get("/likevideo", verifyJWT, getLikedVideos)
 
 export default route;
