@@ -12,5 +12,7 @@ import { verifyJWT } from "../middleware/auth.middleware.js";
 route.post("/video/:videoId", verifyJWT, toggleVideoLike);
 // toggle comment like
 route.post("/comment/:commentId", verifyJWT, toggleCommentLike)
+//  toggle tweet like
+route.post("/tweet/:tweetId", verifyJWT, toggleTweetLike)
 
 export default route;
