@@ -122,8 +122,20 @@ return res.status(201).json(new ApiResponse(201, {tweetLike}, "Tweet liked succe
 });
 
 
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
 const getLikedVideos = asyncHandler(async (req, res) => {
   //TODO: get all liked videos
+const getLikedVideos = await Like.find({
+   likedBy: req.user._id,
+    video: { $exists: true, $ne: null }
+}).populate("video", "videoFile title")
+
+
+if(getLikedVideos.length === 0){
+  throw new ApiError(400, "not found liked video")
+}
+
+return res.status(200).json(new ApiResponse(200, {getLikedVideos}, "fetched liked video successfully"))
 });
 
 export { toggleCommentLike, toggleTweetLike, toggleVideoLike, getLikedVideos };
