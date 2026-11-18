@@ -5,6 +5,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Video } from "../models/video.model.js";
 import {Comment} from "../models/comment.model.js"
+import {Tweet} from "../models/tweet.model.js"
 
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const toggleVideoLike = asyncHandler(async (req, res) => {
@@ -82,10 +83,44 @@ const likeComment =   await Like.create({
 
 });
 
+
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const toggleTweetLike = asyncHandler(async (req, res) => {
   const { tweetId } = req.params;
+  const userId = req.user._id;
   //TODO: toggle like on tweet
+   
+  if(!tweetId){
+    throw new ApiError(400, "TweetId not found")
+  }
+
+  const tweet = await Tweet.findById(tweetId)
+
+  if(!tweet){
+    throw new ApiError(400, "Tweet not found")
+  }
+
+  const existTweetLike = await Like.findOne({
+    tweet: tweetId,
+    likedBy: userId
+  })
+
+  if(existTweetLike){
+    
+    await Like.findByIdAndDelete(existTweetLike._id)
+
+    return res.status(200).json(new ApiResponse(200, {} , "Tweet disLiked successfully" ))
+  }
+
+const tweetLike = await Like.create({
+    tweet: tweetId,
+    likedBy: userId
+})
+
+return res.status(201).json(new ApiResponse(201, {tweetLike}, "Tweet liked successfully"))
+
 });
+
 
 const getLikedVideos = asyncHandler(async (req, res) => {
   //TODO: get all liked videos
