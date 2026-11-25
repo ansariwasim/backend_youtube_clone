@@ -1,0 +1,10 @@
+
+import express from "express";
+import { getChannelStats, getChannelVideos } from "../controllers/dashboad.controller.js";
+const router = express.Router();
+import {verifyJWT} from "../middleware/auth.middleware.js"
+
+// get channel stats
+router.get("/stats", verifyJWT, getChannelStats);
+
+export default router;
