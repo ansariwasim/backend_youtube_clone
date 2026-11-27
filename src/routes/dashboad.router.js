@@ -6,5 +6,7 @@ import {verifyJWT} from "../middleware/auth.middleware.js"
 
 // get channel stats
 router.get("/stats", verifyJWT, getChannelStats);
+// get channel videos 
+router.get("/videos/:userId", verifyJWT, getChannelVideos);
 
 export default router;
